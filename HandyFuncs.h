@@ -231,7 +231,7 @@ public:
 		faster than doing it through this one.
 
 		There also appear to be "blind spots" at certain points, where you can stand inside of them and the algorithm
-		will produce no real solutions even though there are definitely trajectories that would hit the player. I
+		will produce no positive-time solutions even though there are definitely trajectories that would hit the player. I
 		don't know enough about the math involved to solve this, so user beware!
 
 		In reference to the source material: This is method one, the method described by James McNeill. I wrote it
