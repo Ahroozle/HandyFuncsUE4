@@ -820,4 +820,33 @@ bool UHandyFuncs::TimeToImpact_Gravity(FVector ShooterPosition, FVector TargetPo
 
 
 
-//@
+FVector UStaticFuncLib::KochanekBartelInterpolation(FVector P0, FVector P1, FVector P2, FVector P3, float Time, float Tension, float Bias, float Continuity)
+{
+	// http://paulbourke.net/miscellaneous/interpolation/
+	// https://en.wikipedia.org/wiki/Kochanek%E2%80%93Bartels_spline
+
+	const float RevTension = 1 - Tension;
+	const float BiasAdd = 1 + Bias;
+	const float BiasSub = 1 - Bias;
+	const float ContAdd = 1 + Continuity;
+	const float ContSub = 1 - Continuity;
+
+	// Tangents to P1 and P2
+	FVector T1 = ((P1 - P0) * ((RevTension * BiasAdd * ContAdd) / 2)) + ((P2 - P1) * ((RevTension * BiasSub * ContSub) / 2));
+	FVector T2 = ((P2 - P1) * ((RevTension * BiasAdd * ContSub) / 2)) + ((P3 - P2) * ((RevTension * BiasSub * ContAdd) / 2));
+
+	const float TimeSquared = Time * Time;
+	const float TimeCubed = TimeSquared * Time;
+
+	// Coefficients for hermite interpolation on 0-1 interval of time ( https://en.wikipedia.org/wiki/Cubic_Hermite_spline#Unit_interval_(0,_1) )
+	const float C0 = (2 * TimeCubed) - (3 * TimeSquared) + 1;
+	const float C1 = TimeCubed - (2 * TimeSquared) + Time;
+	const float C2 = (-2 * TimeCubed) + (3 * TimeSquared);
+	const float C3 = TimeCubed - TimeSquared;
+
+	return (C0 * P1) + (C1 * T1) + (C2 * P2) + (C3 * T2);
+}
+
+
+
+// @

@@ -244,5 +244,28 @@ public:
 
 
 
-	//@
+	/*
+		Function for advanced interpolation, from a long trek between a bunch of different sources:
+		https://www.youtube.com/watch?v=LNidsMesxSE
+		https://www.patreon.com/posts/overgrowth-like-27261934
+		http://paulbourke.net/miscellaneous/interpolation/
+		https://en.wikipedia.org/wiki/Kochanek%E2%80%93Bartels_spline
+		https://en.wikipedia.org/wiki/Cubic_Hermite_spline#Unit_interval_(0,_1)
+
+		This function interpolates within the range of P1 to P2, using P0 and P3 to construct tangents,
+		and additionally has tension, bias, and continuity variables for extra control.
+
+		Interpolates within the range of P1-P2, using P0 and P3 to construct tangents, and the tension and bias to manipulate them.
+
+		Parameter Cheat sheet:
+		Tension: < 0 = Rounder, > 0 = Tighter
+		Bias: < 0 = Bias toward P1, > 0 = Bias toward P2
+		Continuity: < 0 = Loopier Corners, > 0 = Sharper Corners
+	*/
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "Kochanek-Bartels Spline Interpolation"))
+		static FVector KochanekBartelInterpolation(FVector P0, FVector P1, FVector P2, FVector P3, float Time, float Tension, float Bias, float Continuity);
+
+
+
+	// @
 };
