@@ -245,7 +245,7 @@ public:
 
 
 	/*
-		Function for advanced interpolation, from a long trek between a bunch of different sources:
+		Function for Kochanek-Bartels Spline Interpolation, from a long trek between a bunch of different sources:
 		https://www.youtube.com/watch?v=LNidsMesxSE
 		https://www.patreon.com/posts/overgrowth-like-27261934
 		http://paulbourke.net/miscellaneous/interpolation/
@@ -254,8 +254,6 @@ public:
 
 		This function interpolates within the range of P1 to P2, using P0 and P3 to construct tangents,
 		and additionally has tension, bias, and continuity variables for extra control.
-
-		Interpolates within the range of P1-P2, using P0 and P3 to construct tangents, and the tension and bias to manipulate them.
 
 		Parameter Cheat sheet:
 		Tension: < 0 = Rounder, > 0 = Tighter
