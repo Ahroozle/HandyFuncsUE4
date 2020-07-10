@@ -820,7 +820,7 @@ bool UHandyFuncs::TimeToImpact_Gravity(FVector ShooterPosition, FVector TargetPo
 
 
 
-FVector UStaticFuncLib::KochanekBartelInterpolation(FVector P0, FVector P1, FVector P2, FVector P3, float Time, float Tension, float Bias, float Continuity)
+FVector UHandyFuncs::KochanekBartelInterpolation(FVector P0, FVector P1, FVector P2, FVector P3, float Time, float Tension, float Bias, float Continuity)
 {
 	// http://paulbourke.net/miscellaneous/interpolation/
 	// https://en.wikipedia.org/wiki/Kochanek%E2%80%93Bartels_spline
@@ -848,5 +848,17 @@ FVector UStaticFuncLib::KochanekBartelInterpolation(FVector P0, FVector P1, FVec
 }
 
 
+void UHandyFuncs::HideActorFromPlayerController(APlayerController* PlayerController, AActor* ActorToHide)
+{
+	if (nullptr != PlayerController && nullptr != ActorToHide)
+		PlayerController->HiddenActors.AddUnique(ActorToHide);
+}
 
-// @
+void UHandyFuncs::HideComponentFromPlayerController(APlayerController* PlayerController, UPrimitiveComponent* CompToHide)
+{
+	if (nullptr != PlayerController && nullptr != CompToHide)
+		PlayerController->HiddenPrimitiveComponents.AddUnique(CompToHide);
+}
+
+
+//@

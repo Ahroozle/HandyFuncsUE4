@@ -265,5 +265,26 @@ public:
 
 
 
-	// @
+	/*
+		These funcs hide actors and components from player controllers directly. They've saved me from a lot of headaches
+		related to trying to get OwnerNoSee and OwnerOnlySee to behave.
+
+		Remember that particle system components are also primitive components! This is important because these
+		rendertarget-only particle effects are incredibly handy for making effects that require trails to be
+		drawn in rendertargets, i.e. things like thick grass that bends when you walk through it, paths through
+		sand and snow, and, if you construct your particles just right, even magical things like complex water
+		rippling effects!
+	*/
+
+	// Hides a specified actor from a given player controller.
+	UFUNCTION(BlueprintCallable)
+		static void HideActorFromPlayerController(APlayerController* PlayerController, AActor* ActorToHide);
+
+	// Hides a specified primitive component from a given player controller.
+	UFUNCTION(BlueprintCallable)
+		static void HideComponentFromPlayerController(APlayerController* PlayerController, UPrimitiveComponent* CompToHide);
+
+
+
+	//@
 };
