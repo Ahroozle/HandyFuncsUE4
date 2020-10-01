@@ -266,8 +266,8 @@ public:
 
 
 	/*
-		These funcs hide actors and components from player controllers directly. They've saved me from a lot of headaches
-		related to trying to get OwnerNoSee and OwnerOnlySee to behave.
+		These funcs hide and unhide actors and components from player controllers directly. They've saved me from a lot of headaches
+		related to trying to get OwnerNoSee and OwnerOnlySee to behave, especially alongside scenecaptures.
 
 		Remember that particle system components are also primitive components! This is important because these
 		rendertarget-only particle effects are incredibly handy for making effects that require trails to be
@@ -283,6 +283,12 @@ public:
 	// Hides a specified primitive component from a given player controller.
 	UFUNCTION(BlueprintCallable)
 		static void HideComponentFromPlayerController(APlayerController* PlayerController, UPrimitiveComponent* CompToHide);
+
+	UFUNCTION(BlueprintCallable)
+		static void UnhideActorFromPlayerController(APlayerController* PlayerController, AActor* ActorToUnhide);
+
+	UFUNCTION(BlueprintCallable)
+		static void UnhideComponentFromPlayerController(APlayerController* PlayerController, UPrimitiveComponent* CompToUnhide);
 
 
 

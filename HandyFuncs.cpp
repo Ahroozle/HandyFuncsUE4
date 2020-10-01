@@ -860,5 +860,17 @@ void UHandyFuncs::HideComponentFromPlayerController(APlayerController* PlayerCon
 		PlayerController->HiddenPrimitiveComponents.AddUnique(CompToHide);
 }
 
+void UHandyFuncs::UnhideActorFromPlayerController(APlayerController* PlayerController, AActor* ActorToUnhide)
+{
+	if (nullptr != PlayerController && nullptr != ActorToUnhide)
+		PlayerController->HiddenActors.Remove(ActorToUnhide);
+}
+
+void UHandyFuncs::UnhideComponentFromPlayerController(APlayerController* PlayerController, UPrimitiveComponent* CompToUnhide)
+{
+	if (nullptr != PlayerController && nullptr != CompToUnhide)
+		PlayerController->HiddenPrimitiveComponents.Remove(CompToUnhide);
+}
+
 
 //@
