@@ -292,5 +292,20 @@ public:
 
 
 
+	/*
+		Gets the closest point on a static mesh component's **rendering** mesh, not the collision mesh.
+
+		As this goes through every triangle on a mesh to determine the closest point, discretion is advised.
+		If you want to use this on a large mesh, do it very infrequently, and if you want to do this frequently,
+		do it on very small meshes.
+
+		Negative values mean that the calculation has failed due to some factor.
+
+		NOTE: CPUAccess should be set to true on the mesh!
+	*/
+	UFUNCTION(BlueprintCallable)
+		static float GetDistanceToMesh(class UStaticMeshComponent* Comp, const FVector& Point, FVector& ClosestPoint);
+
+
 	//@
 };

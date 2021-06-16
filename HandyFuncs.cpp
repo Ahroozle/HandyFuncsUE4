@@ -27,6 +27,8 @@
 
 #include "Developer/DesktopPlatform/Public/DesktopPlatformModule.h"
 
+#include "Components/StaticMeshComponent.h"
+
 
 void UHandyFuncs::MakeQBezierPoints(const FVector& P0, const FVector& P1, const FVector& P2, int NumPoints, TArray<FVector>& OutPoints)
 {
@@ -873,4 +875,38 @@ void UHandyFuncs::UnhideComponentFromPlayerController(APlayerController* PlayerC
 }
 
 
-//@
+float UHandyFuncs::GetDistanceToMesh(UStaticMeshComponent* Comp, const FVector& Point, FVector& ClosestPoint)
+{
+	UStaticMesh* CompMesh = Comp->GetStaticMesh();
+	if (nullptr != CompMesh && CompMesh->bAllowCPUAccess)
+	{
+		const FStaticMeshLODResources& LODZero = CompMesh->RenderData->LODResources[0];
+		const FRawStaticIndexBuffer& Inds = LODZero.IndexBuffer;
+		const FPositionVertexBuffer& Verts = LODZero.VertexBuffers.PositionVertexBuffer;
+
+		float RollingDist = 9999999999.0f;
+		bool FoundOne = false;
+		for (int i = 0; i < Inds.GetNumIndices(); i += 3)
+		{
+			const FVector A = Comp->GetComponentTransform().TransformPosition(Verts.VertexPosition(Inds.GetIndex(i)));
+			const FVector B = Comp->GetComponentTransform().TransformPosition(Verts.VertexPosition(Inds.GetIndex(i + 1)));
+			const FVector C = Comp->GetComponentTransform().TransformPosition(Verts.VertexPosition(Inds.GetIndex(i + 2)));
+
+			const FVector& TriClosest = FMath::ClosestPointOnTriangleToPoint(Point, A, B, C);
+			const float TriClosestDist = FVector::Dist(TriClosest, Point);
+
+			if (TriClosestDist < RollingDist)
+			{
+				RollingDist = TriClosestDist;
+				ClosestPoint = TriClosest;
+				FoundOne = true;
+			}
+		}
+
+		if (FoundOne)
+			return RollingDist;
+	}
+
+	ClosestPoint = Point;
+	return -1.0f;
+}
