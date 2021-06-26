@@ -307,5 +307,10 @@ public:
 		static float GetDistanceToMesh(class UStaticMeshComponent* Comp, const FVector& Point, FVector& ClosestPoint);
 
 
-	//@
+	/*
+		If you're not a fan of the frame delay when trying to get the player's viewport size,
+		this function is for you! It's valid at any stage you can request it from beginplay onward.
+	*/
+	UFUNCTION(BlueprintPure)
+		FIntPoint GetSystemResolution() { return{ GSystemResolution.ResX, GSystemResolution.ResY }; }
 };
