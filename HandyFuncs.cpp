@@ -910,3 +910,58 @@ float UHandyFuncs::GetDistanceToMesh(UStaticMeshComponent* Comp, const FVector& 
 	ClosestPoint = Point;
 	return -1.0f;
 }
+
+void UHandyFuncs::LawOfSinesAim2D(const FVector& ShooterPos,
+	const FVector& FiringPos,
+	const FVector& TargetPos,
+	const FVector& TargetVelocity,
+	const FVector& BulletVelocity,
+	FVector& ResultAim,
+	FVector& ExpectedIntersectPoint,
+	float& ResultAngle)
+{
+	const FVector Up = FVector::UpVector;
+	ResultAim = TargetPos - ShooterPos;
+
+	const FVector TargVelNorm = TargetVelocity.GetSafeNormal();
+	const FVector OldAimNorm = (ResultAim - (Up * (Up | ResultAim))).GetSafeNormal();
+	const FVector OldAimRight = OldAimNorm.RotateAngleAxis(90, Up);
+	const float TargSpeed = TargetVelocity.Size2D();
+	const float BulletSpeed = BulletVelocity.Size2D();
+
+	// Law of Sines. Works regardless of distance; all distances share this angle due to triangle similarity
+	const float VelAng = FMath::Sin(PI - FMath::Acos(TargVelNorm | OldAimNorm));
+	ResultAngle = FMath::Asin((TargSpeed * VelAng) / BulletSpeed);
+
+	ResultAngle *= FMath::Sign(OldAimRight | TargVelNorm);
+
+	ResultAim = ResultAim.RotateAngleAxis(FMath::RadiansToDegrees(ResultAngle), Up);
+	FMath::SegmentIntersection2D(TargetPos, TargetPos + (TargVelNorm * 1000000), ShooterPos, ShooterPos + (ResultAim * 1000000), ExpectedIntersectPoint);
+
+	if (!ShooterPos.Equals(FiringPos))
+	{
+		// Because of the offset, we actually have to do this twice.
+		// First at the regular bullet speed, i.e. expecting no offset,
+		// then at a higher bullet speed made to account for having an offset.
+
+		const float ToTargSize = (ExpectedIntersectPoint - ShooterPos).Size2D();
+		const float LengthFactor = (ToTargSize - (FiringPos - ShooterPos).Size2D()) / ToTargSize;
+
+		if (LengthFactor <= 0)
+		{
+			// if the offset is larger than the entire length we travel, we can't really *do*
+			// anything about that. Just fire directly at the target.
+
+			ResultAim = TargetPos - ShooterPos;
+		}
+		else
+		{
+			ResultAngle = FMath::Asin((TargSpeed * VelAng) / (BulletSpeed / LengthFactor));
+
+			ResultAngle *= FMath::Sign(OldAimRight | TargVelNorm);
+
+			ResultAim = (TargetPos - ShooterPos).RotateAngleAxis(FMath::RadiansToDegrees(ResultAngle), Up);
+			FMath::SegmentIntersection2D(ExpectedIntersectPoint, ExpectedIntersectPoint + (TargVelNorm * 1000000), ShooterPos, ShooterPos + (ResultAim * 1000000), ExpectedIntersectPoint);
+		}
+	}
+}

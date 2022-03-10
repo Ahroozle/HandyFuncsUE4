@@ -313,4 +313,24 @@ public:
 	*/
 	UFUNCTION(BlueprintPure)
 		FIntPoint GetSystemResolution() { return{ GSystemResolution.ResX, GSystemResolution.ResY }; }
+
+
+	/*
+		Returns the direction in which you should aim if you want to hit a target moving at a constant velocity.
+
+		Law-of-Sines aiming has a longstanding reputation of being the de-facto cheap shot leading solution due
+		to giving near-perfect results for dirt cheap.
+		
+		This implementation has an additional firing position variable to deal with any discrepancies caused by
+		bullets spawning further along than the shooter's position, effectively translating as an overshot.
+	*/
+	UFUNCTION(BlueprintPure)
+		void LawOfSinesAim2D(const FVector& ShooterPos,
+			const FVector& FiringPos,
+			const FVector& TargetPos,
+			const FVector& TargetVelocity,
+			const FVector& BulletVelocity,
+			FVector& ResultAim,
+			FVector& ExpectedIntersectPoint,
+			float& ResultAngle);
 };
