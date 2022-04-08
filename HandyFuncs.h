@@ -312,7 +312,7 @@ public:
 		this function is for you! It's valid at any stage you can request it from beginplay onward.
 	*/
 	UFUNCTION(BlueprintPure)
-		FIntPoint GetSystemResolution() { return{ GSystemResolution.ResX, GSystemResolution.ResY }; }
+		static FIntPoint GetSystemResolution() { return{ GSystemResolution.ResX, GSystemResolution.ResY }; }
 
 
 	/*
