@@ -325,7 +325,7 @@ public:
 		bullets spawning further along than the shooter's position, effectively translating as an overshot.
 	*/
 	UFUNCTION(BlueprintPure)
-		void LawOfSinesAim2D(const FVector& ShooterPos,
+		static void LawOfSinesAim2D(const FVector& ShooterPos,
 			const FVector& FiringPos,
 			const FVector& TargetPos,
 			const FVector& TargetVelocity,
