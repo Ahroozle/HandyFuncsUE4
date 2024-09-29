@@ -333,4 +333,35 @@ public:
 			FVector& ResultAim,
 			FVector& ExpectedIntersectPoint,
 			float& ResultAngle);
+
+
+
+	/*
+		These funcs come from a small project where I tried to recreate pikmin! Pikmin itself only
+		implements GetLobArc_Simple, i.e. it misses if the elevation is different, so I wondered
+		if there were a way for me to solve that. ... Needless to say, I very quickly found out
+		why Nintendo never bothered solving it.
+	*/
+
+	/*
+		Given a specific apex height to reach and a specific time to reach the destination,
+		Returns the gravity and velocity needed to lob a projectile that achieves both of those.
+
+		Does not account for elevation and instead treats the start and destination as if they
+		are on the same Z.
+	*/
+	UFUNCTION(BlueprintCallable)
+		static void GetLobArc_Simple(FVector ThrowPosition, FVector TargetPosition, float LobApexHeight, float LobTravelTime,
+			FVector& OutThrowVelocity, float& OutThrowGravity);
+
+	/*
+		Given a specific apex height to reach and a specific time to reach the destination,
+		Returns the gravity and velocity needed to lob a projectile that achieves both of those.
+
+		Accounts for elevation, but is more expensive. If the destination is higher than the
+		specified apex, the destination's Z gets clamped in order to avoid NaN values.
+	*/
+	UFUNCTION(BlueprintCallable)
+		static void GetLobArc_Complex(FVector ThrowPosition, FVector TargetPosition, float LobApexHeight, float LobTravelTime,
+			FVector& OutThrowVelocity, float& OutThrowGravity);
 };

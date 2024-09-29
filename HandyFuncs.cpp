@@ -965,3 +965,86 @@ void UHandyFuncs::LawOfSinesAim2D(const FVector& ShooterPos,
 		}
 	}
 }
+
+void UHandyFuncs::GetLobArc_Simple(FVector ThrowPosition, FVector TargetPosition, float LobApexHeight, float LobTravelTime,
+	FVector& OutThrowVelocity, float& OutThrowGravity)
+{
+	const FVector ToTarget = TargetPosition - ThrowPosition;
+
+	/*
+		In order to get both a consistent apex height *and* a consistent
+		travel time, gravity has to change!
+
+		Y1 = Y0 + Vy0*t - 0.5*G*t^2
+		0 = Apex + 0 - 0.5*G*t^2
+		Apex = 0.5*G*t^2
+
+		Gravity = (2 * Apex) / t^2
+	*/
+	const float HalfThrowTime = LobTravelTime / 2; // Only half the time since the gravity calc is based on half the arc!
+	OutThrowGravity = (2 * LobApexHeight) / (HalfThrowTime * HalfThrowTime);
+
+	// Vertical velocity is naturally dictated by gravity and the apex
+	const float VerticalVelocity = FMath::Sqrt(2 * OutThrowGravity * LobApexHeight);
+
+	/*
+		Lateral velocity, on the other hand, is directly correlated to time.
+
+		Doesn't take into account elevation changes; this means it undershoots when
+		lobbing upward and overshoots when lobbing downward!
+	*/
+	const float LateralVelocity = ToTarget.Size2D() / LobTravelTime;
+
+
+	OutThrowVelocity = (ToTarget.GetSafeNormal2D() * LateralVelocity) + (FVector::UpVector * VerticalVelocity);
+
+	OutThrowGravity *= -1;
+}
+
+void UHandyFuncs::GetLobArc_Complex(FVector ThrowPosition, FVector TargetPosition, float LobApexHeight, float LobTravelTime,
+	FVector& OutThrowVelocity, float& OutThrowGravity)
+{
+	const FVector ToTarget = TargetPosition - ThrowPosition;
+
+	// This implementation tries to take elevation into account
+	// in order to land the lob at the target regardless of
+	// how high or low it is.
+
+
+	// one extremely psychotic wolfram alpha question later...
+	// https://www.wolframalpha.com/input?i2d=true&i=solve+Sqrt%5B2*g*a%5D*t+-+Divide%5B1%2C2%5D*g*Power%5Bt%2C2%5D+%3D+h+for+g
+	// (Solving "sqrt(2*g*a)*t - 0.5*g*t^2 = h for g", which is an expansion of the equation "v*t - 0.5g*t^2 = h")
+	//
+	// gravity in terms of apex (a), target height (h), and time taken to get there (t):
+	//
+	// g = (2*(+-2*sqrt(a^2*t^4 - aht^4) + 2*a*t^2 - h*t^2)) / t^4
+	//
+	// How did it get here? good question, but I'm not sure I want to know.
+
+	const float TargetHeight = FMath::Min(ToTarget.Z, LobApexHeight);								// h
+	const float ApexSq = LobApexHeight * LobApexHeight;											// a^2
+	const float TimeSq = LobTravelTime * LobTravelTime;														// t^2
+	const float TimeQu = TimeSq * TimeSq;															// t^4
+
+	const float Eff1 = FMath::Sqrt((ApexSq * TimeQu) - (LobApexHeight * TargetHeight * TimeQu));	// sqrt(a^2*t^4 - aht^4)
+	const float Eff2 = (2 * LobApexHeight * TimeSq);												// 2*a*t^2
+	const float Eff3 = (TargetHeight * TimeSq);														// h*t^2
+
+	const float Result1 = 2 * ((-2 * Eff1) + Eff2 - Eff3) / TimeQu;
+	const float Result2 = 2 * (( 2 * Eff1) + Eff2 - Eff3) / TimeQu;
+
+	//UKismetSystemLibrary::PrintString(this, "Complex Throw Res 1: " + FString::SanitizeFloat(Result1) +
+	//	"\nComplex Throw Res 2: " + FString::SanitizeFloat(Result2));
+
+	OutThrowGravity = FMath::Max(Result1, Result2);
+
+
+	// And then the rest is normal
+
+	const float VerticalVelocity = FMath::Sqrt(2 * OutThrowGravity * LobApexHeight);
+	const float LateralVelocity = ToTarget.Size2D() / LobTravelTime;
+
+	OutThrowVelocity = (ToTarget.GetSafeNormal2D() * LateralVelocity) + (FVector::UpVector * VerticalVelocity);
+
+	OutThrowGravity *= -1;
+}
